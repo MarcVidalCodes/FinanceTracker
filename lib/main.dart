@@ -1,5 +1,5 @@
-import 'package:cash_compass/helpers/constants.dart';
-import 'package:cash_compass/screens/splash_screen.dart';
+import 'package:finance_tracker/helpers/constants.dart';
+import 'package:finance_tracker/screens/main_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -7,7 +7,7 @@ void main() {
 }
 
 class CashCompass extends StatelessWidget {
-  const CashCompass({super.key});
+  const CashCompass({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,9 +25,9 @@ class CashCompass extends StatelessWidget {
     );
 
     return MaterialApp(
-      title: 'CashCompass',
+      title: 'Finance Tracker',
       theme: theme,
-      home: const SplashScreen(),
+      home: const MainScreen(), // Directly set MainScreen as the home
       debugShowCheckedModeBanner: false,
     );
   }

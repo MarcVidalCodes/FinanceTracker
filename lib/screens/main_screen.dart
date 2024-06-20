@@ -1,13 +1,32 @@
-import 'package:cash_compass/components/transaction/render_income_expense.dart';
-import 'package:cash_compass/helpers/constants.dart';
-import 'package:cash_compass/helpers/db.dart';
-import 'package:cash_compass/helpers/transaction_helpers.dart';
-import 'package:cash_compass/screens/crud_transaction.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:finance_tracker/components/transaction/render_income_expense.dart';
+import 'package:finance_tracker/helpers/constants.dart';
+import 'package:finance_tracker/helpers/db.dart';
+import 'package:finance_tracker/helpers/transaction_helpers.dart';
+import 'package:finance_tracker/screens/crud_transaction.dart';
+import 'package:fl_chart/fl_chart.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Finance Tracker',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: MainScreen(),
+    );
+  }
+}
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  const MainScreen({Key? key});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -37,25 +56,17 @@ class _MainScreenState extends State<MainScreen> {
       initialIndex: months.length - 1,
       child: Scaffold(
         appBar: AppBar(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                'assets/images/icon.png',
-                height: 25.0,
-                width: 25.0,
-              ),
-              const SizedBox(width: 8.0),
-              const Text('CashCompass',
-                  style:
-                      TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
-            ],
+          title: const Text(
+            'Your Cash Tracker',
+            style: TextStyle(
+              fontSize: 18.0,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           centerTitle: true,
           bottom: TabBar(
             isScrollable: true,
             tabs: months.map((month) {
-              // Formats the date as "Month Year"
               String monthYear = DateFormat('MMMM yyyy').format(month);
               return Tab(text: monthYear.toUpperCase());
             }).toList(),
@@ -64,7 +75,6 @@ class _MainScreenState extends State<MainScreen> {
         ),
         body: TabBarView(
           children: months.map((month) {
-            // Get the transactions for the month
             List<Transaction> monthTransactions =
                 transactions.where((transaction) {
               DateTime transactionDate = DateTime.parse(transaction.date);
@@ -72,31 +82,18 @@ class _MainScreenState extends State<MainScreen> {
                   transactionDate.year == month.year;
             }).toList();
 
-            // if there are no transactions for the month, render a message
             if (monthTransactions.isEmpty) {
-              return const Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'No transactions for this month',
-                    style: TextStyle(
-                      fontSize: 24.0,
-                      fontWeight: FontWeight.bold,
-                    ),
+              return const Center(
+                child: Text(
+                  'No transactions for this month',
+                  style: TextStyle(
+                    fontSize: 24.0,
+                    fontWeight: FontWeight.bold,
                   ),
-                  SizedBox(height: 8.0),
-                  Text(
-                    'Start adding transactions by clicking the +',
-                    style: TextStyle(
-                      fontSize: 14.0,
-                      color: Colors.grey,
-                    ),
-                  )
-                ],
+                ),
               );
             }
 
-            // Group transactions by date
             Map<String, List<Transaction>> groupedTransactions =
                 groupTransactionsByDate(monthTransactions);
 
@@ -106,7 +103,6 @@ class _MainScreenState extends State<MainScreen> {
                 top: 12,
               ),
               itemBuilder: (BuildContext context, int index) {
-                // Render total income and expense in the first row
                 if (index == 0) {
                   return RenderIncomeExpense(transactions: monthTransactions);
                 }
@@ -119,7 +115,7 @@ class _MainScreenState extends State<MainScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     FractionallySizedBox(
-                      widthFactor: 1.0, // 100% of the width
+                      widthFactor: 1.0,
                       child: Container(
                         margin: const EdgeInsets.only(
                           top: 12,
@@ -140,8 +136,6 @@ class _MainScreenState extends State<MainScreen> {
                         ),
                       ),
                     ),
-
-                    // txns
                     ...transactionsForDate.map((transaction) {
                       Color color = transaction.type == incomeConstant
                           ? Colors.green
@@ -170,8 +164,6 @@ class _MainScreenState extends State<MainScreen> {
                                 style: const TextStyle(
                                     fontWeight: FontWeight.w500,
                                     fontSize: 16.0)),
-
-                            // If the transaction has a note, render it
                             if (transaction.note != '')
                               Container(
                                 margin: const EdgeInsets.only(top: 4.0),
@@ -192,7 +184,6 @@ class _MainScreenState extends State<MainScreen> {
                               fontSize: 16.0),
                         ),
                         onTap: () {
-                          // your tap handling logic here, for example:
                           debugPrint('Transaction ${transaction.id} tapped');
                           Navigator.of(context)
                               .push(
@@ -203,7 +194,6 @@ class _MainScreenState extends State<MainScreen> {
                             ),
                           )
                               .then((_) {
-                            // Fetch the transactions again after returning from the CrudTransaction page
                             fetchTransactions();
                           });
                         },
@@ -215,22 +205,181 @@ class _MainScreenState extends State<MainScreen> {
             );
           }).toList(),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.of(context)
-                .push(
-              MaterialPageRoute(
-                builder: (context) => const CrudTransaction(),
+        floatingActionButton: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            FloatingActionButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        GraphScreen(transactions: transactions),
+                  ),
+                );
+              },
+              child: const Icon(Icons.bar_chart),
+            ),
+            const SizedBox(height: 12),
+            FloatingActionButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .push(
+                  MaterialPageRoute(
+                    builder: (context) => const CrudTransaction(),
+                  ),
+                )
+                    .then((_) {
+                  fetchTransactions();
+                });
+              },
+              child: const Icon(Icons.add),
+            ),
+          ],
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+      ),
+    );
+  }
+}
+
+class GraphScreen extends StatelessWidget {
+  final List<Transaction> transactions;
+
+  const GraphScreen({Key? key, required this.transactions}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Graphs'),
+      ),
+      body: Center(
+        child: BarChartSample2(transactions: transactions),
+      ),
+    );
+  }
+}
+
+class BarChartSample2 extends StatelessWidget {
+  final List<Transaction> transactions;
+  const BarChartSample2({Key? key, required this.transactions})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    double totalIncome = 0;
+    double totalExpense = 0;
+
+    // Calculate total income and total expense
+    for (var transaction in transactions) {
+      if (transaction.type == incomeConstant) {
+        totalIncome += transaction.amount;
+      } else {
+        totalExpense += transaction.amount;
+      }
+    }
+
+    double maxYValue = totalIncome > totalExpense ? totalIncome : totalExpense;
+    return Container(
+      width: 300,
+      height: 600,
+      child: AspectRatio(
+        aspectRatio: 1.5,
+        child: BarChart(
+          BarChartData(
+            maxY: maxYValue,
+            barTouchData: BarTouchData(
+              touchTooltipData: BarTouchTooltipData(
+                getTooltipColor: (group) {
+                  return Colors.grey;
+                },
+                getTooltipItem: (a, b, c, d) => null,
               ),
-            )
-                .then((_) {
-              // Fetch the transactions again after returning from the CrudTransaction page
-              fetchTransactions();
-            });
-          },
-          child: const Icon(Icons.add),
+              touchCallback: (FlTouchEvent event, response) {},
+            ),
+            titlesData: FlTitlesData(
+              show: true,
+              rightTitles:
+                  AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                    showTitles: true,
+                    getTitlesWidget: (value, meta) {
+                      switch (value.toInt()) {
+                        case 0:
+                          return Padding(
+                            padding: EdgeInsets.only(
+                                top: 8), // Adjust the space as needed
+                            child: Text('Income   /   Expense',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                )),
+                          );
+                        default:
+                          return Text('');
+                      }
+                    }),
+              ),
+              leftTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  getTitlesWidget: (value, meta) => Text('${value.toInt()}'),
+                  reservedSize:
+                      40, // Adjust the reserved size for Y-axis titles
+                ),
+              ),
+            ),
+            borderData: FlBorderData(
+              show: true,
+              border: Border(
+                left: BorderSide(
+                    color: Colors.black, width: 1), // Show left border
+                bottom: BorderSide(
+                    color: Colors.black, width: 1), // Show bottom border
+                top: BorderSide(
+                    color: Colors.transparent, width: 0), // Hide top border
+                right: BorderSide(
+                    color: Colors.transparent, width: 0), // Hide right border
+              ),
+            ),
+            barGroups: [
+              makeGroupData(0, totalIncome, totalExpense),
+            ],
+            gridData: FlGridData(show: false),
+          ),
         ),
       ),
+    ); // Added the missing closing parenthesis here
+  }
+
+  BarChartGroupData makeGroupData(int x, double y1, double y2) {
+    return BarChartGroupData(
+      barsSpace: 30,
+      x: x,
+      barRods: [
+        BarChartRodData(
+          toY: y1,
+          color: Colors.green,
+          width: 35,
+          borderRadius: BorderRadius.only(
+            topLeft:
+                Radius.circular(20), // Adjust the radius for rounding as needed
+            topRight: Radius.circular(20),
+          ),
+        ),
+        BarChartRodData(
+          toY: y2,
+          color: Colors.red,
+          width: 35,
+          borderRadius: BorderRadius.only(
+            topLeft:
+                Radius.circular(20), // Adjust the radius for rounding as needed
+            topRight: Radius.circular(20),
+          ),
+        ),
+      ],
     );
   }
 }

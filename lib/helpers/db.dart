@@ -21,7 +21,7 @@ class DatabaseHelper {
 
   setDb() async {
     io.Directory documentDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentDirectory.path, 'cash_compass.db');
+    String path = join(documentDirectory.path, 'finance_tracker.db');
     var theDb = await openDatabase(path, version: 1, onCreate: _onCreate);
     return theDb;
   }

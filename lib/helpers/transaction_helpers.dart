@@ -1,5 +1,5 @@
-import 'package:cash_compass/helpers/constants.dart';
-import 'package:cash_compass/helpers/db.dart';
+import 'package:finance_tracker/helpers/constants.dart';
+import 'package:finance_tracker/helpers/db.dart';
 
 List<DateTime> getMonths() {
   List<DateTime> months = [];

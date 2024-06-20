@@ -1,4 +1,4 @@
-name: cash_compass
+name: finance_tracker
 description: A new Flutter project.
 publish_to: 'none'
 version: 0.1.3+4
@@ -13,6 +13,7 @@ dependencies:
   sqflite: ^2.3.0
   path_provider: ^2.0.15
   path: ^1.8.3
+  fl_chart: ^0.68.0
 
 dev_dependencies:
   flutter_test:
@@ -22,7 +23,6 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/images/
     - android/app/src/main/res/mipmap-mdpi/ic_launcher.png
     - android/app/src/main/res/mipmap-hdpi/ic_launcher.png
     - android/app/src/main/res/mipmap-xhdpi/ic_launcher.png

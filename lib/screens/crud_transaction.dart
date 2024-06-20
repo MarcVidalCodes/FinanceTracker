@@ -1,9 +1,9 @@
-import 'package:cash_compass/components/ui/date_picker.dart';
-import 'package:cash_compass/components/ui/dropdown_form.dart';
-import 'package:cash_compass/components/ui/text_field.dart';
-import 'package:cash_compass/helpers/db.dart';
+import 'package:finance_tracker/components/ui/date_picker.dart';
+import 'package:finance_tracker/components/ui/dropdown_form.dart';
+import 'package:finance_tracker/components/ui/text_field.dart';
+import 'package:finance_tracker/helpers/db.dart';
 import 'package:flutter/material.dart';
-import 'package:cash_compass/helpers/constants.dart';
+import 'package:finance_tracker/helpers/constants.dart';
 
 class CrudTransaction extends StatefulWidget {
   final Transaction? transaction;
@@ -44,7 +44,9 @@ class _CrudTransactionState extends State<CrudTransaction> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.transaction == null
-            ? 'Add Transaction'
+            ? _typeSelected['name'] == 'Income'
+                ? 'Add Income'
+                : 'Add Expense'
             : 'Update ${widget.transaction!.type}'),
         backgroundColor: _typeSelected['color'],
       ),

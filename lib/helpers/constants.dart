@@ -15,7 +15,7 @@ List expenseCategories = [
     'icon': Icons.directions_car,
   },
   {
-    'name': 'Shopping',
+    'name': 'Groceries',
     'icon': Icons.shopping_bag,
   },
   {
@@ -50,10 +50,6 @@ List incomeCategories = [
     'icon': Icons.business,
   },
   {
-    'name': 'Gifts',
-    'icon': Icons.card_giftcard,
-  },
-  {
     'name': 'Investments',
     'icon': Icons.attach_money,
   },
@@ -79,7 +75,6 @@ List transactionTypes = [
 ];
 
 List currencies = [
-  {'currency': 'INR', 'symbol': '₹'},
+  {'currency': 'CAD', 'symbol': '\$'},
   {'currency': 'USD', 'symbol': '\$'},
-  {'currency': 'EUR', 'symbol': '€'}
 ];
